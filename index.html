@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <!-- <link rel="stylesheet" href="style.css" /> -->
+    <style>
+   
+      body {
+        margin: 0;
+        padding-bottom: 3rem;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+      }
+
+      #form {
+        background: rgba(0, 0, 0, 0.15);
+        padding: 0.25rem;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        height: 3rem;
+        box-sizing: border-box;
+        backdrop-filter: blur(10px);
+      }
+      #input {
+        border: none;
+        padding: 0 1rem;
+        flex-grow: 1;
+        border-radius: 2rem;
+        margin: 0.25rem;
+      }
+      #input:focus {
+        outline: 1px solid #000;
+      }
+      #form > button {
+        background: #222ece;
+        border: none;
+        padding: 0 1rem;
+        margin: 0.25rem;
+        border-radius: 3px;
+        outline: 1px solid #222ece;
+        color: #fff;
+      }
+
+      #form{
+        background:rgb(22, 29, 32)
+      }
+
+      #messages {
+        background:rgb(4, 250, 156);
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+      #messages > li {
+        padding: 0.5rem 1rem;
+      }
+      #messages > li:nth-child(odd) {
+        background: #86991c;
+      }
+      #chat{
+        height:500px;
+      }
+
+      #contentWrap {
+        display: none;
+
+      }
+      #chatWrap {
+        float: left;
+        border: 1px #000 solid
+      }
+      #users{
+        position: fixed;
+        height: 30%;
+        bottom: 50%;
+        right: 0;
+        border: 1px solid black;
+        font-size: 30px;
+        background: #ffffff6c
+      }
+      #nName{
+        position:absolute;
+        border: 1px solid #000;
+        right: 3px;
+        bottom: 3px;
+      }
+   
+    </style>
+  </head>
+  <body>
+    <div id="nickWrap">
+    <p>Enter a username:</p>
+    <p id="nickError"></p>
+        <form id="setNick">
+            <input size="35" id="nickname"></input>
+            <input type="submit"></input>
+        </form>
+    </div>  
+    <div id="contentWrap">
+       <div id="chatWrap">
+            <div id="chat"></div>
+            <form id="form" action="">
+              <input id="input" autocomplete="off" /><button>Send</button>
+            </form>
+            
+      </div>
+        <div id="users" ></div>
+        <div id="nName"></div>
+    </div>
+    <ul id="messages"></ul>
+    <script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+
+      var $nickForm = $('#setNick');
+      var $nickError = $('#nickError');
+      var $nickBox = $('#nickname');
+      var $users = $('#users');
+      var messages = document.getElementById("messages");
+      var form = document.getElementById("form");
+      var input = document.getElementById("input");
+      var $nName = $('#nName')
+
+
+      $nickForm.submit((e)=>{
+        e.preventDefault();
+        socket.emit('new user', $nickBox.val(), (data)=>{
+            if(data){
+                $('#nickWrap').hide();
+                $('#contentWrap').show();;
+                $users.show
+                $nName.show
+                
+            
+            }else {
+                $nickError.html('User name already in use, try another name');
+            }
+        });
+        $nickBox.val('');
+        
+        
+      });
+
+      socket.on('usernames', (data)=>{
+        var html = '';
+        for(i = 0; i < data.length; i++){
+            html += data[i] + '<br/>'
+        }
+        $users.html(html);
+        let $nName = ;
+      })
+
+ 
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (input.value) {
+          socket.emit("chat message", input.value);
+          input.value = "";
+        }
+      });
+
+      socket.on("chat message", function (msg) {
+        var item = document.createElement("li");
+        item.textContent = msg;
+        // messages.append('<b>' + data.nick + ': </b>' + data.msg + '<br/>');
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+
+      
+      // socket.on("chat message", (data)=>{
+      //   messages.append('<b>' + data.nick + ': </b>' + data.msg + '<br/>');
+      // })
+
+
+    </script>
+  </body>
+</html>
